@@ -1,54 +1,49 @@
-# Vera Bot — magicpin AI Challenge
+# Vera — magicpin AI Merchant Assistant
 
-## What it does
+Vera is a production-grade AI assistant designed to help magicpin merchants engage with their customers and manage their business via WhatsApp.
 
-Runs a FastAPI server that acts as "Vera", magicpin's merchant assistant. Takes in merchant/category/trigger/customer context via HTTP, composes WhatsApp messages using an LLM, and handles multi-turn conversations.
+## 🚀 Public Bot URL
+**URL**: [https://magicpin-vera-bot-tbbl.onrender.com](https://magicpin-vera-bot-tbbl.onrender.com)
 
-Built around the 4-context framework from the challenge brief. Uses multiple API keys with automatic failover so it doesn't die when one key gets rate-limited.
+---
 
-### Folder layout
+## 🧠 Technical Approach
 
-```
-├── app/
-│   ├── bot.py              # FastAPI routes (healthz, context, tick, reply)
-│   ├── composer.py          # LLM calls + prompt construction
-│   └── context_store.py     # in-memory state (contexts, convos, suppression)
-│
-├── scripts/
-│   ├── generate_submission.py   # offline batch run -> submission.jsonl
-│   └── judge_simulator.py       # local test harness
-│
-├── data/
-│   ├── dataset/             # seed data + expanded test fixtures
-│   └── submission.jsonl     # output from generate_submission
-│
-├── docs/                    # challenge briefs, research notes, examples
-├── .env                     # API keys (not committed to public repos)
-└── requirements.txt
-```
+### 1. 10-Tier Cascading Fallback Engine
+To ensure near-100% availability during high-traffic events or API outages, Vera uses a **Dynamic Orchestration Layer**. It rotates through up to 10 distinct API configurations (Groq, Gemini, OpenAI, DeepSeek) defined in environment variables. If a primary provider returns a `429 Rate Limit` or `500 Error`, the system cascades to the next tier in milliseconds.
 
-### How it works
+### 2. Heuristic-First Intelligence
+Before invoking an LLM, Vera runs a lightweight heuristic scan to:
+- **Detect Auto-replies**: Prevents "infinite loops" between bots.
+- **Detect Opt-outs**: Automatically handles "Stop" or "Not interested" messages to respect merchant privacy.
+- **Track Intent Commitment**: Identifies when a merchant has already said "Yes" to minimize redundant sales pitches.
 
-1. Judge pushes context (category voice rules, merchant data, triggers) via `/v1/context`
-2. Judge calls `/v1/tick` with available triggers → bot composes proactive messages
-3. Merchant replies come in via `/v1/reply` → bot handles multi-turn (auto-reply detection, hostile opt-out, intent commits)
+### 3. Contextual Persona Mapping
+The system uses a 4-context framework (**Category**, **Merchant**, **Trigger**, and **Customer**) to generate hyper-personalized responses. The prompt engineering is tuned for a professional yet friendly "Hinglish" (Hindi-English) tone, reflecting the real-world communication style of Indian merchants.
 
-The composer tries Groq first, then falls back through up to 9 more API keys (Gemini, OpenAI, DeepSeek) if it hits rate limits. Config lives in `.env` as `API_1_*` through `API_10_*`.
+---
 
-### Design tradeoffs
+## 🤖 Model Choice
 
-- **In-memory state** — no DB, no persistence across restarts. Good enough for the 60-min test window.
-- **Single prompt for all trigger types** — a prod system would have per-trigger prompt variants. We rely on the system prompt + rich context instead.
-- **Heuristics before LLM** — auto-reply and hostile detection happen with pattern matching, not LLM calls. Faster and more predictable.
+- **Primary Model**: `Llama-3.3-70b-versatile` (via Groq)
+  - **Reason**: Exceptional speed (low latency is critical for chat) and strong performance in code-mixed (Hindi-English) languages.
+- **Secondary Model**: `Gemini-2.0-Flash` (via Google AI Studio)
+  - **Reason**: Massive context window and extremely high reliability as a fallback tier.
 
-### Running locally
+These models were selected because they provide the best balance of **linguistic nuance** (understanding Indian cultural context) and **inference speed**.
 
-```bash
-uvicorn app.bot:app --host 0.0.0.0 --port 8080
+---
 
-# test with the judge
-python scripts/judge_simulator.py
+## ⚖️ Tradeoffs
 
-# batch generate submission file
-python scripts/generate_submission.py
-```
+- **Consistency vs. Availability**: We chose a cascading fallback approach. While switching models might lead to slight variations in tone, we prioritized **Availability** (always responding to the merchant) over strict model consistency.
+- **Latency vs. Cost**: We implemented local heuristics for common intents. This adds slight complexity to the code but significantly reduces **Latency** and **API Costs** by skipping the LLM for simple "Yes/No" or "Stop" responses.
+- **State Management**: We used an in-memory `ContextStore` for this challenge. This provides sub-millisecond state lookups but would need to be traded off for a distributed database (like Redis) in a multi-region production environment.
+
+---
+
+## 🛠️ Project Structure
+- `app/`: Core FastAPI server, state management, and LLM composer.
+- `scripts/`: Testing tools and submission generators.
+- `data/`: The context datasets (Categories, Merchants, Triggers).
+- `docs/`: Original research and challenge briefs.
