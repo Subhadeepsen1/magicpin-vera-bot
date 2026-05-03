@@ -14,6 +14,7 @@ load_dotenv()
 from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from app.context_store import ContextStore
@@ -29,6 +30,15 @@ from app.composer import (
 
 app = FastAPI(title="Vera Bot — magicpin AI Challenge")
 store = ContextStore()
+
+# Enable CORS for the dashboard
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Serve static dashboard
 app.mount("/static", StaticFiles(directory="static"), name="static")
