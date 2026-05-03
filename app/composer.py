@@ -454,6 +454,9 @@ def compose_reply(conversation_history: list[dict], merchant: dict,
     Compose a reply to a merchant/customer message in an ongoing conversation.
     """
     identity = merchant.get("identity", {})
+    
+    voice_data = category.get('voice', '')
+    voice_tone = voice_data.get('tone', '?') if isinstance(voice_data, dict) else str(voice_data)
 
     conv_text = "\n".join(
         f"[{t.get('from', '?').upper()}] {t.get('body', '')}"
@@ -462,10 +465,11 @@ def compose_reply(conversation_history: list[dict], merchant: dict,
 
     user_prompt = f"""CONVERSATION CONTEXT:
 Merchant: {identity.get('name', '?')} (Owner: {identity.get('owner_first_name', '?')})
-Category: {category.get('slug', '?')} (Voice: {category.get('voice', {}).get('tone', '?')})
+Category: {category.get('slug', '?')} (Voice: {voice_tone})
 Original trigger: {trigger.get('kind', '?')}
 Turn number: {turn_number}
 Auto-reply detections so far in this conversation: {auto_reply_count}
+
 
 CONVERSATION SO FAR:
 {conv_text}
