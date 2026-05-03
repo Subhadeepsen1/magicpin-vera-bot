@@ -21,15 +21,17 @@ Author: magicpin AI Challenge Team
 # =============================================================================
 
 # Your bot's URL (where your bot is running)
-BOT_URL = "http://localhost:8080"
+BOT_URL = "https://magicpin-vera-bot-tbbl.onrender.com"
 
 # Choose your LLM provider: "openai", "anthropic", "gemini", "deepseek", "groq", "ollama", "openrouter"
 LLM_PROVIDER = "groq"
 
-# Your API key (paste your key here)
-LLM_API_KEY = "your_api_key_here"
+# Your API key — set via environment variable or paste here:
+# export GROQ_API_KEY="gsk_..."
+import os as _os
+LLM_API_KEY = _os.environ.get("GROQ_API_KEY", "your_groq_api_key_here")
 
-# Model to use (leave empty for default, or specify like "gpt-4o", "claude-3-5-sonnet-20241022", etc.)
+# Model to use
 LLM_MODEL = "llama-3.3-70b-versatile"
 
 # For Ollama only: local server URL
