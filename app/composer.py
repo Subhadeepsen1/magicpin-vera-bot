@@ -486,11 +486,17 @@ Respond with ONLY a JSON object."""
         return _parse_reply_response(raw)
 
     except Exception as e:
+        error_msg = str(e)
+        if "No valid API configurations" in error_msg:
+            body = "I'm ready to help, but my API keys haven't been set up in the Render Dashboard yet! Please add API_1_KEY to the environment variables."
+        else:
+            body = f"AI Error: {error_msg[:100]}"
+
         return {
             "action": "send",
-            "body": "Got it, let me follow up on that.",
+            "body": body,
             "cta": "open_ended",
-            "rationale": f"Fallback due to LLM error: {str(e)[:100]}",
+            "rationale": f"LLM error: {error_msg}",
         }
 
 
