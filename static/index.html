@@ -125,7 +125,8 @@
                         message: text,
                         turn_number: 1,
                         from_role: "merchant",
-                        merchant_id: "m_001_mylari"
+                        merchant_id: "m_001_mylari",
+                        received_at: new Date().toISOString()
                     })
                 });
                 
@@ -134,8 +135,7 @@
                 window.removeChild(thinking);
                 const botMsg = document.createElement('div');
                 botMsg.className = 'msg bot-msg';
-                // Dump the raw JSON if body is missing so we can debug
-                botMsg.innerText = data.body || JSON.stringify(data);
+                botMsg.innerText = data.body || "Sorry, I'm having trouble connecting to the AI.";
                 window.appendChild(botMsg);
                 window.scrollTop = window.scrollHeight;
             } catch (e) {
