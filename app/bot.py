@@ -318,6 +318,46 @@ async def reply(body: ReplyRequest):
     return result
 
 
+# --- demo data loader ---
+
+@app.on_event("startup")
+async def load_demo_data():
+    """Pre-loads some data so the Jury Sandbox works immediately."""
+    print("Loading demo data for juries...")
+    
+    # Demo Category
+    store.push_context("category", {
+        "slug": "southindiancafe",
+        "name": "South Indian Cafe",
+        "voice": "Traditional, warm, and inviting. Uses terms like 'Annapoorna', 'Authentic', and 'Fresh'."
+    })
+    
+    # Demo Merchant
+    store.push_context("merchant", {
+        "merchant_id": "m_001_mylari",
+        "category_slug": "southindiancafe",
+        "identity": {
+            "name": "Mylari South Indian Cafe",
+            "city": "Mysuru"
+        },
+        "business": {
+            "specialty": "Mylari Dose, Filter Coffee",
+            "usp": "Softest idlis in town"
+        }
+    })
+    
+    # Demo Trigger
+    store.push_context("trigger", {
+        "id": "t_001_planning",
+        "kind": "active_planning_intent",
+        "payload": {
+            "intent": "Bulk corporate order",
+            "discount_available": "15%"
+        }
+    })
+    print("Demo data loaded successfully.")
+
+
 # --- main ---
 
 if __name__ == "__main__":

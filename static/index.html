@@ -117,17 +117,15 @@
 
             try {
                 // We use a mock conversation ID for the demo
-                const response = await fetch('/v1/tick', {
+                const response = await fetch('/v1/reply', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         conversation_id: "demo_jury_conv",
-                        merchant_message: text,
+                        message: text,
                         turn_number: 1,
-                        metadata: {
-                            merchant_id: "m_001_mylari",
-                            trigger_id: "t_001_planning"
-                        }
+                        from_role: "merchant",
+                        merchant_id: "m_001_mylari"
                     })
                 });
                 const data = await response.json();
