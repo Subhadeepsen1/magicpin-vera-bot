@@ -325,15 +325,15 @@ async def load_demo_data():
     """Pre-loads some data so the Jury Sandbox works immediately."""
     print("Loading demo data for juries...")
     
-    # Demo Category
-    store.add_context("category", "southindiancafe", {
+    # Demo Category (Version 1)
+    store.push_context("category", "southindiancafe", 1, {
         "slug": "southindiancafe",
         "name": "South Indian Cafe",
         "voice": "Traditional, warm, and inviting. Uses terms like 'Annapoorna', 'Authentic', and 'Fresh'."
     })
     
-    # Demo Merchant
-    store.add_context("merchant", "m_001_mylari", {
+    # Demo Merchant (Version 1)
+    store.push_context("merchant", "m_001_mylari", 1, {
         "merchant_id": "m_001_mylari",
         "category_slug": "southindiancafe",
         "identity": {
@@ -346,8 +346,8 @@ async def load_demo_data():
         }
     })
     
-    # Demo Trigger
-    store.add_context("trigger", "t_001_planning", {
+    # Demo Trigger (Version 1)
+    store.push_context("trigger", "t_001_planning", 1, {
         "id": "t_001_planning",
         "kind": "active_planning_intent",
         "payload": {
