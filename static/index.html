@@ -128,19 +128,21 @@
                         merchant_id: "m_001_mylari"
                     })
                 });
+                
                 const data = await response.json();
                 
                 window.removeChild(thinking);
                 const botMsg = document.createElement('div');
                 botMsg.className = 'msg bot-msg';
-                botMsg.innerText = data.body || "Sorry, I'm having trouble connecting to the AI.";
+                // Dump the raw JSON if body is missing so we can debug
+                botMsg.innerText = data.body || JSON.stringify(data);
                 window.appendChild(botMsg);
                 window.scrollTop = window.scrollHeight;
             } catch (e) {
                 window.removeChild(thinking);
                 const botMsg = document.createElement('div');
                 botMsg.className = 'msg bot-msg';
-                botMsg.innerText = "Error: Make sure the bot is live and API keys are set.";
+                botMsg.innerText = "Fatal JS Error: " + e.message;
                 window.appendChild(botMsg);
             }
         }
