@@ -60,25 +60,92 @@
             </div>
         </div>
 
+        <section class="chat-section">
+            <div class="card chat-card">
+                <div class="chat-header">
+                    <h3>Vera Live Sandbox</h3>
+                    <p>Type a message below to see how Vera responds to a merchant in Hinglish.</p>
+                </div>
+                <div class="chat-window" id="chatWindow">
+                    <div class="msg bot-msg">Hi! I'm Vera. You can act as Suresh from Mylari Cafe. Try saying "I want to run a discount" or "I am busy today".</div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="userInput" placeholder="Type your message to Vera..." onkeypress="if(event.key === 'Enter') sendMessage()">
+                    <button id="sendBtn" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </section>
+
         <footer>
             Built for the magicpin AI Challenge 2026
         </footer>
     </div>
 
     <script>
-        // Simple dashboard logic
         async function updateStats() {
             try {
                 const res = await fetch('/v1/metadata');
                 const data = await res.json();
                 document.getElementById('metaTeam').innerText = data.team_name;
                 document.getElementById('uptime').innerText = data.uptime_seconds + 's';
-            } catch (e) {
-                console.log('API not yet live');
-            }
+            } catch (e) {}
         }
         setInterval(updateStats, 5000);
         updateStats();
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const window = document.getElementById('chatWindow');
+            const btn = document.getElementById('sendBtn');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'msg user-msg';
+            userMsg.innerText = text;
+            window.appendChild(userMsg);
+            input.value = '';
+            window.scrollTop = window.scrollHeight;
+
+            // Add thinking indicator
+            const thinking = document.createElement('div');
+            thinking.className = 'msg bot-msg thinking';
+            thinking.innerText = 'Vera is thinking...';
+            window.appendChild(thinking);
+            window.scrollTop = window.scrollHeight;
+
+            try {
+                // We use a mock conversation ID for the demo
+                const response = await fetch('/v1/tick', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        conversation_id: "demo_jury_conv",
+                        merchant_message: text,
+                        turn_number: 1,
+                        metadata: {
+                            merchant_id: "m_001_mylari",
+                            trigger_id: "t_001_planning"
+                        }
+                    })
+                });
+                const data = await response.json();
+                
+                window.removeChild(thinking);
+                const botMsg = document.createElement('div');
+                botMsg.className = 'msg bot-msg';
+                botMsg.innerText = data.body || "Sorry, I'm having trouble connecting to the AI.";
+                window.appendChild(botMsg);
+                window.scrollTop = window.scrollHeight;
+            } catch (e) {
+                window.removeChild(thinking);
+                const botMsg = document.createElement('div');
+                botMsg.className = 'msg bot-msg';
+                botMsg.innerText = "Error: Make sure the bot is live and API keys are set.";
+                window.appendChild(botMsg);
+            }
+        }
     </script>
 </body>
 </html>
