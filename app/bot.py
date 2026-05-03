@@ -11,7 +11,9 @@ from typing import Any, Optional
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from app.context_store import ContextStore
@@ -28,8 +30,16 @@ from app.composer import (
 app = FastAPI(title="Vera Bot — magicpin AI Challenge")
 store = ContextStore()
 
+# Serve static dashboard
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/", include_in_schema=False)
+async def get_dashboard():
+    return FileResponse("static/index.html")
+
 TEAM_NAME = os.environ.get("TEAM_NAME", "Subhadeep")
 TEAM_EMAIL = os.environ.get("TEAM_EMAIL", "subhadeepsen@example.com")
+START_TIME = time.time()
 
 
 # --- request/response models ---
@@ -73,12 +83,13 @@ async def metadata():
     return {
         "team_name": TEAM_NAME,
         "team_members": [TEAM_NAME],
-        "model": os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile"),
+        "uptime_seconds": int(time.time() - START_TIME),
+        "model": os.environ.get("API_1_MODEL", "llama-3.3-70b-versatile"),
         "approach": (
             "4-context LLM composer with trigger-kind dispatch, "
             "auto-reply detection heuristics, intent-transition handling, "
-            "and Groq API for fast inference. Prompts encode category voice, "
-            "merchant state, and compulsion levers."
+            "and a 10-tier fallback mechanism. Prompts encode category voice, "
+            "merchant state, and Hinglish tone."
         ),
         "contact_email": TEAM_EMAIL,
         "version": "1.0.0",

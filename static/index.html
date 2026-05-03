@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vera AI | magicpin Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo">VERA<span>AI</span></div>
+            <div class="badge">
+                <div class="pulse"></div>
+                System Active
+            </div>
+        </header>
+
+        <section class="hero">
+            <h1>The Merchant <br>Co-pilot for magicpin.</h1>
+            <p class="hero-sub">Vera is a hyper-resilient AI assistant designed for Indian merchants. Built with a 10-tier fallback architecture and Hinglish language support.</p>
+            <button onclick="window.open('https://github.com/Subhadeepsen1/magicpin-vera-bot', '_blank')">View Repository</button>
+        </section>
+
+        <div class="grid">
+            <div class="card">
+                <h3>10-Tier Fallback</h3>
+                <p>Ensuring 99.9% availability by cascading through multiple LLM providers on rate limits.</p>
+                <div class="tier-stack" id="tierStack">
+                    <div class="tier-item tier-active"><span>Tier 1: Groq (Llama 3.3)</span> <span>Primary</span></div>
+                    <div class="tier-item"><span>Tier 2: Gemini (2.0 Flash)</span> <span>Active</span></div>
+                    <div class="tier-item"><span>Tier 3: Gemini (Pro)</span> <span>Backup</span></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Smart Heuristics</h3>
+                <p>Detecting intent commitment and auto-replies locally to minimize latency and token costs.</p>
+                <div class="tier-stack">
+                    <div class="tier-item"><span>Auto-reply Detection</span> <span>✓</span></div>
+                    <div class="tier-item"><span>Hostile Intent Opt-out</span> <span>✓</span></div>
+                    <div class="tier-item"><span>Commit Tracking</span> <span>✓</span></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>V1 Metadata</h3>
+                <p>Production API endpoints strictly following the magicpin AI Challenge specifications.</p>
+                <div class="tier-stack">
+                    <div class="tier-item"><span>/v1/metadata</span> <span id="metaTeam">Subhadeep</span></div>
+                    <div class="tier-item"><span>/v1/tick</span> <span>POST</span></div>
+                    <div class="tier-item"><span>Uptime</span> <span id="uptime">0s</span></div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            Built for the magicpin AI Challenge 2026
+        </footer>
+    </div>
+
+    <script>
+        // Simple dashboard logic
+        async function updateStats() {
+            try {
+                const res = await fetch('/v1/metadata');
+                const data = await res.json();
+                document.getElementById('metaTeam').innerText = data.team_name;
+                document.getElementById('uptime').innerText = data.uptime_seconds + 's';
+            } catch (e) {
+                console.log('API not yet live');
+            }
+        }
+        setInterval(updateStats, 5000);
+        updateStats();
+    </script>
+</body>
+</html>
