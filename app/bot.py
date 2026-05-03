@@ -307,7 +307,7 @@ async def reply(body: ReplyRequest):
     except Exception as e:
         result = {
             "action": "send",
-            "body": "Noted, let me check on that for you.",
+            "body": f"Backend Error: {str(e)}",
             "cta": "open_ended",
             "rationale": f"Fallback reply due to error: {str(e)[:100]}",
         }
